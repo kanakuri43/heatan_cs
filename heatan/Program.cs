@@ -2,15 +2,54 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
+using System.IO.Ports;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace heatan
 {
     internal class Program
     {
+
+
         static void Main(string[] args)
+        {
+            SerialPort port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
+            port.DataReceived += new SerialDataReceivedEventHandler(SerialPort_DataReceived);
+            try
+            {
+                port.Open();
+                port.DtrEnable = true;
+                port.RtsEnable = true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected exception : {0}", e.ToString());
+            }
+            Console.ReadLine();
+            port.Close();
+            port.Dispose();
+        }
+
+        private static void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort port = (SerialPort)sender;
+            string data = port.ReadExisting();   // ポートから文字列を受信する
+            if (!string.IsNullOrEmpty(data))
+            {
+
+                Console.Write(data);
+                //    Invoke((MethodInvoker)(() =>    // 受信用スレッドから切り替えてデータを書き込む
+                //    {
+                //        label2.Text = data; // ラベルを受信した文字列へ変更
+                //        Thread.Sleep(1);
+                //        button1.Enabled = true; // ボタンを押せるようにしておく
+                //    }));
+                //}
+            }
+        }
+
+        private void DataInsert()
         {
             var dc = new DatabaseController();
             using (SqlCommand command = new SqlCommand("usp_insert_room_status", dc.Connection))
@@ -26,7 +65,7 @@ namespace heatan
                 command.ExecuteNonQuery();
 
             }
-
         }
+
     }
 }
