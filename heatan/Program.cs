@@ -37,8 +37,9 @@ namespace heatan
             string data = port.ReadExisting();   // ポートから文字列を受信する
             if (!string.IsNullOrEmpty(data))
             {
+                string[] receivedDataArray = data.Split('\u002C');
 
-                Console.Write(data);
+                Console.Write(receivedDataArray[0], receivedDataArray[1]);
                 //    Invoke((MethodInvoker)(() =>    // 受信用スレッドから切り替えてデータを書き込む
                 //    {
                 //        label2.Text = data; // ラベルを受信した文字列へ変更
@@ -46,6 +47,7 @@ namespace heatan
                 //        button1.Enabled = true; // ボタンを押せるようにしておく
                 //    }));
                 //}
+
             }
         }
 
